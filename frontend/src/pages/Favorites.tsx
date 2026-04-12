@@ -71,12 +71,9 @@ const Favorites = () => {
       )}
 
       {!loading && !error && favorites.length === 0 && (
-        <div className='text-center py-20 bg-slate-800/20 rounded-[3rem] border border-dashed border-slate-700/50'>
+        <div className='text-center py-20'>
           <Heart className='w-16 h-16 text-slate-700 mx-auto mb-6' />
           <h2 className='text-2xl font-bold mb-2'>No favorites yet</h2>
-          <p className='text-slate-500 max-w-sm mx-auto'>
-            Start adding your favorites to build your personal collection.
-          </p>
         </div>
       )}
     </div>
