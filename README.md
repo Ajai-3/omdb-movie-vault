@@ -10,6 +10,7 @@ Movie Vault is a professional movie exploration and collection management platfo
 ![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
 ![Express.js](https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
 
 ## Features
 
@@ -19,12 +20,14 @@ Movie Vault is a professional movie exploration and collection management platfo
 - Responsive Design: Fully optimized for various screen sizes using a modern aesthetic.
 - Global State: Centralized state management using Redux Toolkit.
 - Error Handling: Comprehensive catch-all error handling and user notifications via React Toastify.
+- Containerization: Backend support for Docker-based deployment and execution.
 
 ## Getting Started
 
 ### Prerequisites
 
 - Node.js (version 18 or higher)
+- Docker and Docker Compose (optional)
 - OMDb API Key (available at https://www.omdbapi.com/)
 
 ### Installation
@@ -37,7 +40,10 @@ Movie Vault is a professional movie exploration and collection management platfo
 
 2. Configure Environment Variables:
 
-   **Backend:** Create a `.env` file in the `backend/` directory:
+   The project includes `.env.example` files in both the frontend and backend directories. Copy these to `.env` files and populate them with your specific keys.
+
+   **Backend:**
+   Copy `backend/.env.example` to `backend/.env` and update the `OMDB_API_KEY`:
    ```env
    PORT=5000
    OMDB_API_KEY=your_api_key_here
@@ -50,7 +56,16 @@ Movie Vault is a professional movie exploration and collection management platfo
    VITE_API_BASE_URL=http://localhost:5000/api
    ```
 
-### Execution
+## Running the Application
+
+### Method 1: Docker (Recommended)
+You can run the backend environment using Docker Compose:
+```bash
+cd backend
+docker-compose up --build
+```
+
+### Method 2: Manual Execution
 
 #### Running the Backend
 ```bash
