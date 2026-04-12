@@ -1,5 +1,5 @@
-import { ROUTES } from '@/constants/routes';
-import { MovieController } from '@/controllers/MovieController';
+import { ROUTES } from '../constants/routes';
+import { MovieController } from '../controllers/MovieController';
 import Router from 'express';
 
 const router = Router();

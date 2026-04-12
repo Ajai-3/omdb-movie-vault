@@ -1,14 +1,16 @@
 import type { Request, Response, NextFunction } from 'express';
 import { AxiosError } from 'axios';
-import { MOVIE_MESSAGES } from '@/constants/movieMessages';
+import { MOVIE_MESSAGES } from '../constants/movieMessages';
 
 export class AppError extends Error {
   constructor(
-    public message: string,
+    public override message: string,
     public statusCode: number = 500,
   ) {
     super(message);
     this.name = 'AppError';
+
+    Error.captureStackTrace(this, this.constructor);
   }
 }
 
@@ -31,7 +33,6 @@ export function errorHandler(
     return;
   }
 
-  // Handle our custom AppError
   if (err instanceof AppError) {
     res.status(err.statusCode).json({
       success: false,
@@ -41,7 +42,6 @@ export function errorHandler(
     return;
   }
 
-  // Fallback — unexpected server error
   res.status(500).json({
     success: false,
     error: MOVIE_MESSAGES.UNEXPECTED_SERVER_ERROR,
