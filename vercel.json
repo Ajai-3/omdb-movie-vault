@@ -1,12 +1,17 @@
 {
   "version": 2,
+  "functions": {
+    "backend/src/server.ts": {
+      "runtime": "vercel-node@latest"
+    }
+  },
   "rewrites": [
     {
-      "source": "/api/(.*)",
+      "source": "/api/:path*",
       "destination": "/backend/src/server.ts"
     },
     {
-      "source": "/(.*)",
+      "source": "/((?!api/).*)",
       "destination": "/frontend/index.html"
     }
   ]
