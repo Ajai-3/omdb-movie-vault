@@ -1,9 +1,11 @@
 export interface Movie {
   imdbID: string;
-  title: string;
-  year: string;
-  type: string;
-  poster: string;
+  Title: string;
+  Year: string;
+  Type: string;
+  Poster: string;
+  imdbRating?: string;
+  isFavorite?: boolean;
 }
 
 export interface MovieSearchResult {

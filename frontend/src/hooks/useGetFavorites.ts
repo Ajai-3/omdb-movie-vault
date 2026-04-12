@@ -1,25 +1,56 @@
-import { useState, useCallback } from 'react';
+import { useCallback } from 'react';
 import ApiClient from '../api/Axios';
 import { API_ROUTES } from '../constants/routes';
-import { useMovieContext } from '../context/MovieContext';
+import { useAppDispatch, useAppSelector } from '../store/hooks';
+import {
+  setFavorites,
+  setFavoritesLoading,
+  setFavoritesError,
+  setFavoritesPagination,
+} from '../store/movieSlice';
 
 export const useGetFavorites = () => {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const { favorites, setFavorites } = useMovieContext();
+  const dispatch = useAppDispatch();
+  const {
+    favorites,
+    favoritesLoading: loading,
+    favoritesError: error,
+    totalPages,
+    totalCount,
+  } = useAppSelector((state) => state.movies);
 
-  const getFavorites = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const { data } = await ApiClient.get(API_ROUTES.FAVORITES);
-      setFavorites(data.Search || []);
-    } catch (err: any) {
-      setError(err.message || 'Failed to fetch favorites');
-    } finally {
-      setLoading(false);
-    }
-  }, [setFavorites]);
+  const getFavorites = useCallback(
+    async (page: number = 1, limit: number = 10) => {
+      dispatch(setFavoritesLoading(true));
+      dispatch(setFavoritesError(null));
+      try {
+        const { data: response } = await ApiClient.get(API_ROUTES.FAVORITES, {
+          params: { page, limit },
+        });
 
-  return { favorites, loading, error, getFavorites };
+        if (response.status) {
+          dispatch(setFavorites(response.data.movies || []));
+          dispatch(
+            setFavoritesPagination({
+              totalCount: response.data.pagination.totalCount,
+              totalPages: response.data.pagination.totalPages,
+            }),
+          );
+        } else {
+          dispatch(
+            setFavoritesError(response.message || 'Failed to fetch favorites'),
+          );
+        }
+      } catch (err) {
+        const message =
+          err instanceof Error ? err.message : 'Failed to fetch favorites';
+        dispatch(setFavoritesError(message));
+      } finally {
+        dispatch(setFavoritesLoading(false));
+      }
+    },
+    [dispatch],
+  );
+
+  return { favorites, loading, error, totalPages, totalCount, getFavorites };
 };

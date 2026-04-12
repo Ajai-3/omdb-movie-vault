@@ -15,7 +15,7 @@ interface Props {
   emptyMessage?: string;
 }
 
-const MovieGrid: React.FC =  ({
+const MovieGrid: React.FC = ({
   movies,
   isLoading,
   error,
@@ -37,7 +37,7 @@ const MovieGrid: React.FC =  ({
   if (error) {
     return (
       <div className='movie-grid__status movie-grid__status--error'>
-        <p>⚠️ {error}</p>
+        <p>{error}</p>
       </div>
     );
   }
@@ -90,6 +90,6 @@ const MovieGrid: React.FC =  ({
       )}
     </div>
   );
-}
+};
 
 export default MovieGrid;
