@@ -15,7 +15,7 @@ interface Props {
   emptyMessage?: string;
 }
 
-const MovieGrid: React.FC = ({
+const MovieGrid: React.FC<Props> = ({
   movies,
   isLoading,
   error,
