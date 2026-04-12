@@ -19,7 +19,7 @@ export const toggleFavoriteId = async (id: string): Promise<string[]> => {
   const ids = await getFavoriteIds();
   const index = ids.indexOf(id);
   if (index === -1) {
-    ids.push(id);
+    ids.unshift(id);
   } else {
     ids.splice(index, 1);
   }

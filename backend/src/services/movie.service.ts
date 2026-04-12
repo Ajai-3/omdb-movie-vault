@@ -17,36 +17,34 @@ export const searchMovies = async (query: string, page: number = 1) => {
         Response: 'False',
         Error: response.data.Error,
         Search: [],
-        totalResults: "0"
+        totalResults: '0',
       };
     }
 
-    // Enriching search results with full details (including ratings)
     const movies = response.data.Search || [];
     const detailedMovies = await Promise.all(
-        movies.map(async (movie: any) => {
-            try {
-                const detailRes = await axios.get(`${BASE_URL}/`, {
-                    params: {
-                        apikey: API_KEY,
-                        i: movie.imdbID
-                    }
-                });
-                return {
-                    ...movie,
-                    imdbRating: detailRes.data.imdbRating || 'N/A'
-                };
-            } catch (err) {
-                return { ...movie, imdbRating: 'N/A' };
-            }
-        })
+      movies.map(async (movie: any) => {
+        try {
+          const detailRes = await axios.get(`${BASE_URL}/`, {
+            params: {
+              apikey: API_KEY,
+              i: movie.imdbID,
+            },
+          });
+          return {
+            ...movie,
+            imdbRating: detailRes.data.imdbRating || 'N/A',
+          };
+        } catch (err) {
+          return { ...movie, imdbRating: 'N/A' };
+        }
+      }),
     );
 
     return {
-        ...response.data,
-        Search: detailedMovies
+      ...response.data,
+      Search: detailedMovies,
     };
-
   } catch (error) {
     console.error('Error searching movies:', error);
     throw error;
@@ -64,7 +62,7 @@ export const getMoviesByIds = async (ids: string[]) => {
           apikey: API_KEY,
           i: id,
         },
-      })
+      }),
     );
     const responses = await Promise.all(requests);
     return responses.map((res) => ({
@@ -74,7 +72,7 @@ export const getMoviesByIds = async (ids: string[]) => {
       Type: res.data.Type,
       Poster: res.data.Poster,
       imdbRating: res.data.imdbRating || 'N/A',
-      isFavorite: true // We know these are favorites because they came from the IDs list
+      isFavorite: true,
     }));
   } catch (error) {
     console.error('Error fetching movies by IDs:', error);
