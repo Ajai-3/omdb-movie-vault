@@ -27,9 +27,9 @@ const movieSlice = createSlice({
       state.favorites = action.payload;
       state.favoriteIds = action.payload.map(m => m.imdbID);
     },
-    setFavoritesPagination: (state, action: PayloadAction<{ totalPages: number; totalCount: number }>) => {
+    setFavoritesPagination: (state, action: PayloadAction<{ totalPages: number; totalResults: number }>) => {
       state.totalPages = action.payload.totalPages;
-      state.totalCount = action.payload.totalCount;
+      state.totalCount = action.payload.totalResults;
     },
     setFavoritesLoading: (state, action: PayloadAction<boolean>) => {
       state.favoritesLoading = action.payload;

@@ -3,7 +3,7 @@ import ApiClient from '../api/Axios';
 import { API_ROUTES } from '../constants/routes';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { addFavoriteId, removeFavoriteId } from '../store/movieSlice';
-import toast from 'react-hot-toast';
+import { toast } from 'react-toastify';
 
 export const useToggleFavorite = () => {
   const [loading, setLoading] = useState(false);
@@ -18,10 +18,10 @@ export const useToggleFavorite = () => {
       if (response.status) {
         if (response.data.isFavorite) {
           dispatch(addFavoriteId(id));
-          toast.success(`${title || 'Movie'} added to vault`, { icon: '❤️' });
+          toast.success(`${title || 'Movie'} added to favorites`);
         } else {
           dispatch(removeFavoriteId(id));
-          toast.success(`${title || 'Movie'} removed from vault`, { icon: '🗑️' });
+          toast.success(`${title || 'Movie'} removed from favorites`);
         }
       }
     } catch (err: unknown) {

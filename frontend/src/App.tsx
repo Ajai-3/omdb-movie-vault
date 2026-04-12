@@ -4,7 +4,8 @@ import { Provider } from 'react-redux';
 import { store } from './store/store';
 import Navbar from './components/Navbar';
 import { Loader2 } from 'lucide-react';
-import { Toaster } from 'react-hot-toast';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 // Lazy load pages
 const Home = lazy(() => import('./pages/Home'));
@@ -22,7 +23,18 @@ const App = () => {
     <Provider store={store}>
       <Router>
         <div className='min-h-screen bg-black text-[#E0E7E0]'>
-          <Toaster position='top-center' />
+          <ToastContainer 
+            position='top-center'
+            theme='dark'
+            autoClose={3000}
+            hideProgressBar={false}
+            newestOnTop={false}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+          />
           <Navbar />
           <main className='max-w-7xl mx-auto px-6 py-8'>
             <Suspense fallback={<PageLoader />}>
