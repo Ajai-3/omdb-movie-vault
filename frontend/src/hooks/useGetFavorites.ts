@@ -16,7 +16,7 @@ export const useGetFavorites = () => {
     favoritesLoading: loading,
     favoritesError: error,
     totalPages,
-    totalCount,
+    totalResults,
   } = useAppSelector((state) => state.movies);
 
   const getFavorites = useCallback(
@@ -32,7 +32,7 @@ export const useGetFavorites = () => {
           dispatch(setFavorites(response.data.movies || []));
           dispatch(
             setFavoritesPagination({
-              totalCount: response.data.pagination.totalCount,
+              totalResults: response.data.pagination.totalResults,
               totalPages: response.data.pagination.totalPages,
             }),
           );
@@ -52,5 +52,5 @@ export const useGetFavorites = () => {
     [dispatch],
   );
 
-  return { favorites, loading, error, totalPages, totalCount, getFavorites };
+  return { favorites, loading, error, totalPages, totalResults, getFavorites };
 };

@@ -4,7 +4,8 @@ import MovieCard from '../components/MovieCard';
 import { Heart, Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
 
 const Favorites = () => {
-  const { favorites, loading, error, totalPages, totalCount, getFavorites } = useGetFavorites();
+  const { favorites, loading, error, totalPages, totalResults, getFavorites } =
+    useGetFavorites();
   const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
@@ -21,7 +22,7 @@ const Favorites = () => {
           <Heart className='w-8 h-8 text-main fill-current' />
           <h1 className='text-3xl font-bold font-display'>Your Favorites</h1>
           <span className='bg-slate-800 text-slate-400 px-3 py-1 rounded-full text-sm'>
-            {totalCount}
+            {totalResults}
           </span>
         </div>
 

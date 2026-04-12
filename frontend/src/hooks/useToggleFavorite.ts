@@ -25,7 +25,7 @@ export const useToggleFavorite = () => {
         }
       }
     } catch (err: unknown) {
-      let message = 'Failed to update vault';
+      let message = 'Failed to update favorites';
       if (err instanceof Error) message = err.message;
       toast.error(message);
       console.error('Failed to toggle favorite', err);

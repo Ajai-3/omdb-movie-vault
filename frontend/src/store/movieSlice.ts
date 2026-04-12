@@ -7,7 +7,7 @@ interface MovieState {
   favoritesLoading: boolean;
   favoritesError: string | null;
   totalPages: number;
-  totalCount: number;
+  totalResults: number;
 }
 
 const initialState: MovieState = {
@@ -16,7 +16,7 @@ const initialState: MovieState = {
   favoritesLoading: false,
   favoritesError: null,
   totalPages: 0,
-  totalCount: 0,
+  totalResults: 0,
 };
 
 const movieSlice = createSlice({
@@ -29,7 +29,7 @@ const movieSlice = createSlice({
     },
     setFavoritesPagination: (state, action: PayloadAction<{ totalPages: number; totalResults: number }>) => {
       state.totalPages = action.payload.totalPages;
-      state.totalCount = action.payload.totalResults;
+      state.totalResults = action.payload.totalResults;
     },
     setFavoritesLoading: (state, action: PayloadAction<boolean>) => {
       state.favoritesLoading = action.payload;
