@@ -1,12 +1,10 @@
-version: '3.8'
-
 services:
   backend:
-    build: ./backend
+    build: .
+    container_name: movie-vault-backend
     ports:
-      - "5000:5000"
+      - '5000:5000'
     env_file:
-      - ./backend/.env
+      - .env
     volumes:
-      - ./backend/data:/app/data
-
+      - ./favorites.json:/app/favorites.json

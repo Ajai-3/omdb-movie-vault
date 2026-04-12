@@ -8,10 +8,8 @@ RUN npm install
 
 COPY . .
 
-RUN mkdir -p data && chmod 777 data
-
 RUN npm run build
 
 EXPOSE 5000
 
-CMD ["npm", "start"]
+CMD ["npx", "tsx", "dist/server.js"]
