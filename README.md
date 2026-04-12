@@ -1,23 +1,31 @@
-# 🎬 MovieVault — MERN Movie Explorer
+# Movie Vault
 
-MovieVault is a premium movie search and discovery platform built with the MERN stack (MongoDB (simulated with JSON), Express, React, Node.js). It features a sleek dark UI, real-time search with OMDB API, and persistent favorites management.
+Movie Vault is a professional movie exploration and collection management platform. It allows users to search for movies via the OMDb API and manage a personal "vault" of favorites with persistent storage.
 
-## ✨ Features
+## Tech Stack
 
-- **🔍 Smart Search**: Debounced search powered by OMDB API.
-- **❤️ Vault Storage**: Persist your favorite movies in a local JSON "vault".
-- **💎 Premium UI**: Built with Tailwind CSS, Glassmorphism, and Framer-like micro-animations.
-- **🏗️ MVC Architecture**: Clean code structure on the backend.
-- **⚓ Custom Hooks**: Optimized React logic with custom hooks for search and state management.
-- **🐳 Docker Ready**: Full containerization for both frontend and backend.
+![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![Redux](https://img.shields.io/badge/Redux-593D88?style=for-the-badge&logo=redux&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
+![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
+![Express.js](https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
 
-## 🚀 Getting Started
+## Features
+
+- Search Functionality: Real-time movie search utilizing the OMDb API with debouncing.
+- Favorites Management: Toggle movies in and out of a personal vault.
+- Persistent Storage: Backend storage implementation using a structured JSON system.
+- Responsive Design: Fully optimized for various screen sizes using a modern aesthetic.
+- Global State: Centralized state management using Redux Toolkit.
+- Error Handling: Comprehensive catch-all error handling and user notifications via React Toastify.
+
+## Getting Started
 
 ### Prerequisites
 
-- Node.js >= 18.x
-- Docker & Docker Compose (optional)
-- OMDB API Key
+- Node.js (version 18 or higher)
+- OMDb API Key (available at https://www.omdbapi.com/)
 
 ### Installation
 
@@ -27,67 +35,73 @@ MovieVault is a premium movie search and discovery platform built with the MERN 
    cd omdb-movie-vault
    ```
 
-2. Set up environment variables:
-   - Create `backend/.env`:
-     ```env
-     PORT=5000
-     OMDB_API_KEY=your_key_here
-     OMDB_BASE_URL=https://www.omdbapi.com
-     ```
-   - Create `frontend/.env`:
-     ```env
-     VITE_BASE_URL=http://localhost:5000/api/movies
-     ```
+2. Configure Environment Variables:
 
-### Running with Docker (Recommended)
+   **Backend:** Create a `.env` file in the `backend/` directory:
+   ```env
+   PORT=5000
+   OMDB_API_KEY=your_api_key_here
+   OMDB_BASE_URL=https://www.omdbapi.com
+   FRONTEND_URL=http://localhost:5173
+   ```
 
-```bash
-docker-compose up --build
-```
+   **Frontend:** Create a `.env` file in the `frontend/` directory:
+   ```env
+   VITE_API_BASE_URL=http://localhost:5000/api
+   ```
 
-### Manual Development
+### Execution
 
-**Backend:**
+#### Running the Backend
 ```bash
 cd backend
 npm install
-npm run dev
+npm run start
 ```
 
-**Frontend:**
+#### Running the Frontend
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
 
-## 📡 API Reference
+## Implementation Choices
 
-| Method | Endpoint | Description |
-| :--- | :--- | :--- |
-| `GET` | `/api/movies/search?q=...` | Search for movies |
-| `GET` | `/api/movies/favorites` | Get all favorite movies |
-| `POST` | `/api/movies/favorites` | Toggle movie in favorites |
+- Redux Toolkit: Chosen for global state management to ensure consistent UI synchronization (e.g., heart icons reflecting favorite status) across different pages.
+- ESM Architecture: The project utilizes ECMAScript Modules for modern development standards.
+- Custom Hooks: Decoupled logic from UI components using specialized hooks (`useSearchMovies`, `useToggleFavorite`) for better maintainability.
+- JSON File Persistence: Implemented a robust file-based storage system on the backend to simulate a database with high reliability and zero external dependencies.
+- Bundler Strategy: Utilizes `tsx` and `Vite` for high-performance development and execution without the overhead of complex build steps.
 
-## 🛠️ Project Structure
+## Project Structure
 
 ```plaintext
 ├── backend/
 │   ├── src/
-│   │   ├── controllers/   # Request handling
-│   │   ├── services/      # Business logic (OMDB & Filesysten)
-│   │   ├── interface/     # TypeScript interfaces
-│   │   └── server.ts      # Entry point
-│   └── data/              # Persistent JSON storage
+│   │   ├── controllers/   # Request orchestration
+│   │   ├── services/      # Business logic (OMDb & Storage)
+│   │   ├── routes/        # API route definitions
+│   │   └── server.ts      # Server entry point
+│   └── data/              # JSON vault storage
 ├── frontend/
 │   ├── src/
-│   │   ├── components/    # Reusable UI components
-│   │   ├── hooks/         # Custom movie logic (useMovies)
-│   │   ├── pages/         # Home & Favorites pages
-│   │   └── api/           # Axios client & endpoints
-└── docker-compose.yml
+│   │   ├── store/         # Redux configuration and slices
+│   │   ├── hooks/         # Specialized business logic hooks
+│   │   ├── components/    # Reusable UI elements
+│   │   └── pages/         # Application views
+└── README.md
 ```
 
-## 📝 License
+## API Endpoints
 
-ISC
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| GET | /api/movies/search | Search OMDb movie database |
+| GET | /api/movies/favorites | Retrieve all movies from the vault |
+| POST | /api/movies/favorites | Toggle a movie in/out of favorites |
+
+## Notes
+
+- Ensure your OMDb API key is valid; otherwise, search results will not load.
+- The favorites vault is stored in `backend/data/favorites.json`.

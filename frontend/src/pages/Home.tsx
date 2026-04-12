@@ -1,12 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useSearchMovies } from '../hooks/useSearchMovies';
 import MovieCard from '../components/MovieCard';
-import {
-  Loader2,
-  ChevronLeft,
-  ChevronRight,
-  SearchIcon,
-} from 'lucide-react';
+import { Loader2, ChevronLeft, ChevronRight, SearchIcon } from 'lucide-react';
 import useDebounce from '../hooks/useDebounce';
 
 const Home = () => {
@@ -14,7 +9,8 @@ const Home = () => {
   const [page, setPage] = useState(1);
   const debouncedQuery = useDebounce(query, 600);
 
-  const { movies, loading, error, totalResults, searchMovies } = useSearchMovies();
+  const { movies, loading, error, totalResults, searchMovies } =
+    useSearchMovies();
 
   // Search when debounced query or page changes
   useEffect(() => {
@@ -50,7 +46,7 @@ const Home = () => {
         <div className='absolute -inset-1 bg-gradient-to-r from-[#ABFF00]/0 via-[#ABFF00]/20 to-[#ABFF00]/0 rounded-2xl blur opacity-25 group-focus-within:opacity-100 transition duration-1000'></div>
 
         <div className='relative'>
-          <SearchIcon className='absolute left-6 top-1/2 -translate-y-1/2 text-[#ABFF00] text-2xl z-10' />
+          <SearchIcon className='absolute left-6 top-1/2 -translate-y-1/2 text-main text-2xl z-10' />
           <input
             type='text'
             placeholder='Search movies...'
@@ -74,17 +70,17 @@ const Home = () => {
             <button
               onClick={() => handlePageChange(page - 1)}
               disabled={page === 1}
-              className='p-2 hover:bg-[#202620] hover:text-[#ABFF00] rounded-xl disabled:opacity-20 transition-all font-bold'
+              className='p-2 hover:bg-[#202620] hover:text-main rounded-xl disabled:opacity-20 transition-all font-bold'
             >
               <ChevronLeft className='w-5 h-5' />
             </button>
-            <span className='text-xs font-black px-4 bg-[#202620] h-9 flex items-center rounded-lg text-[#ABFF00]'>
+            <span className='text-xs font-black px-4 bg-[#202620] h-9 flex items-center rounded-lg text-main'>
               Page {page} / {totalPages}
             </span>
             <button
               onClick={() => handlePageChange(page + 1)}
               disabled={page === totalPages}
-              className='p-2 hover:bg-[#202620] hover:text-[#ABFF00] rounded-xl disabled:opacity-20 transition-all font-bold'
+              className='p-2 hover:bg-[#202620] hover:text-main rounded-xl disabled:opacity-20 transition-all font-bold'
             >
               <ChevronRight className='w-5 h-5' />
             </button>
@@ -96,9 +92,9 @@ const Home = () => {
         <div className='flex flex-col items-center justify-center py-20 gap-6'>
           <div className='relative'>
             <div className='w-16 h-16 border-4 border-[#ABFF00]/10 border-t-[#ABFF00] rounded-full animate-spin' />
-            <Loader2 className='w-8 h-8 text-[#ABFF00] absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 animate-pulse' />
+            <Loader2 className='w-8 h-8 text-main absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 animate-pulse' />
           </div>
-          <p className='text-[#ABFF00] font-black text-xs uppercase tracking-[0.3em]'>
+          <p className='text-main font-black text-xs uppercase tracking-[0.3em]'>
             Searching...
           </p>
         </div>
@@ -109,7 +105,7 @@ const Home = () => {
         error &&
         !loading &&
         movies.length === 0 && (
-          <div className='text-center py-24 bg-[#141814] rounded-[3rem] border border-[#202620] space-y-4'>
+          <div className='text-center py-24 space-y-4'>
             <div className='w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mx-auto'>
               <span className='text-red-500 text-2xl font-black'>!</span>
             </div>

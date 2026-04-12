@@ -1,8 +1,9 @@
 import type { Request, Response, NextFunction } from 'express';
-import * as movieService from '@/services/movie.service';
-import * as favoriteService from '@/services/favorite.service';
-import { HttpStatus } from '@/constants/https-status';
-import type { IMovieController } from '@/interface/IMovieController';
+import * as movieService from '../services/movie.service';
+import * as favoriteService from '../services/favorite.service';
+import { HttpStatus } from '../constants/https-status';
+import type { IMovieController } from '../interface/IMovieController';
+import { MOVIE_MESSAGES } from '../constants/movieMessages';
 
 export class MovieController implements IMovieController {
   constructor() {}
@@ -18,48 +19,51 @@ export class MovieController implements IMovieController {
       const l = limit ? parseInt(limit as string) : 10;
 
       if (!q) {
-        return res.status(HttpStatus.OK).json({
+        return res.status(HttpStatus.BAD_REQUEST).json({
           status: true,
-          message: 'Please provide a search query',
-          data: { movies: [], pagination: { totalResults: 0, totalPages: 0, currentPage: p } }
+          message: MOVIE_MESSAGES.PROVIDE_SEARCH_QUERY,
+          data: {
+            movies: [],
+            pagination: { totalResults: 0, totalPages: 0, currentPage: p },
+          },
         });
       }
 
       const data = await movieService.searchMovies(q as string, p);
-      
+
       if (data.Response === 'False') {
         return res.status(HttpStatus.OK).json({
           status: false,
-          message: data.Error || 'No movies found',
+          message: MOVIE_MESSAGES.NOT_FOUND,
           data: {
             movies: [],
             pagination: {
               totalResults: 0,
               totalPages: 0,
-              currentPage: p
-            }
-          }
+              currentPage: p,
+            },
+          },
         });
       }
 
       const favoriteIds = await favoriteService.getFavoriteIds();
       const enrichedMovies = (data.Search || []).map((movie: any) => ({
         ...movie,
-        isFavorite: favoriteIds.includes(movie.imdbID)
+        isFavorite: favoriteIds.includes(movie.imdbID),
       }));
 
       const totalResults = parseInt(data.totalResults);
       return res.status(HttpStatus.OK).json({
         status: true,
-        message: 'Movies fetched successfully',
+        message: MOVIE_MESSAGES.SUCCESS,
         data: {
           movies: enrichedMovies,
           pagination: {
             totalResults: totalResults,
             totalPages: Math.ceil(totalResults / l),
-            currentPage: p
-          }
-        }
+            currentPage: p,
+          },
+        },
       });
     } catch (error) {
       next(error);
@@ -77,19 +81,19 @@ export class MovieController implements IMovieController {
       const l = limit ? parseInt(limit as string) : 10;
 
       const ids = await favoriteService.getFavoriteIds();
-      
+
       if (ids.length === 0) {
         return res.status(HttpStatus.OK).json({
           status: true,
-          message: 'Vault is empty',
+          message: MOVIE_MESSAGES.FAVORITES_EMPTY,
           data: {
             movies: [],
             pagination: {
               totalResults: 0,
               totalPages: 0,
-              currentPage: p
-            }
-          }
+              currentPage: p,
+            },
+          },
         });
       }
 
@@ -99,15 +103,15 @@ export class MovieController implements IMovieController {
 
       return res.status(HttpStatus.OK).json({
         status: true,
-        message: 'Favorites fetched successfully',
+        message: MOVIE_MESSAGES.FAVORITES_SUCCESS,
         data: {
           movies: movies,
           pagination: {
             totalResults: ids.length,
             totalPages: Math.ceil(ids.length / l),
-            currentPage: p
-          }
-        }
+            currentPage: p,
+          },
+        },
       });
     } catch (error) {
       next(error);
@@ -124,8 +128,8 @@ export class MovieController implements IMovieController {
       if (!id) {
         return res.status(HttpStatus.BAD_REQUEST).json({
           status: false,
-          message: 'Movie ID is required',
-          data: null
+          message: MOVIE_MESSAGES.MOVIE_ID_REQUIRED,
+          data: null,
         });
       }
 
@@ -134,8 +138,10 @@ export class MovieController implements IMovieController {
 
       return res.status(HttpStatus.OK).json({
         status: true,
-        message: isAdded ? 'Added to vault' : 'Removed from vault',
-        data: { id, isFavorite: isAdded }
+        message: isAdded
+          ? MOVIE_MESSAGES.FAVORITES_ADD
+          : MOVIE_MESSAGES.FAVORITES_REMOVE,
+        data: { id, isFavorite: isAdded },
       });
     } catch (error) {
       next(error);

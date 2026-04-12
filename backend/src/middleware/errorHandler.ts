@@ -1,18 +1,19 @@
 import type { Request, Response, NextFunction } from 'express';
 import { AxiosError } from 'axios';
+import { MOVIE_MESSAGES } from '../constants/movieMessages';
 
-// Custom application error with optional HTTP status code
 export class AppError extends Error {
   constructor(
-    public message: string,
+    public override message: string,
     public statusCode: number = 500,
   ) {
     super(message);
     this.name = 'AppError';
+
+    Error.captureStackTrace(this, this.constructor);
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function errorHandler(
   err: Error | AppError | AxiosError,
   _req: Request,
@@ -21,19 +22,17 @@ export function errorHandler(
 ): void {
   console.error('[ErrorHandler]', err.message);
 
-  // Handle Axios (OMDB fetch) errors
   if ((err as AxiosError).isAxiosError) {
     const axiosErr = err as AxiosError;
     const status = axiosErr.response?.status || 502;
     res.status(status).json({
       success: false,
-      error: 'Failed to reach the OMDB API. Please try again later.',
+      error: MOVIE_MESSAGES.FAILED_TO_REACH_OMDB_API,
       statusCode: status,
     });
     return;
   }
 
-  // Handle our custom AppError
   if (err instanceof AppError) {
     res.status(err.statusCode).json({
       success: false,
@@ -43,10 +42,9 @@ export function errorHandler(
     return;
   }
 
-  // Fallback — unexpected server error
   res.status(500).json({
     success: false,
-    error: 'An unexpected server error occurred',
+    error: MOVIE_MESSAGES.UNEXPECTED_SERVER_ERROR,
     statusCode: 500,
   });
 }

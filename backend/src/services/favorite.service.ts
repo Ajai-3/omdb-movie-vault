@@ -1,33 +1,18 @@
 import fs from 'fs/promises';
-import path from 'path';
 
-const DATA_DIR = path.join(process.cwd(), 'data');
-const FILE_PATH = path.join(DATA_DIR, 'favorites.json');
+const FILE_PATH = 'favorites.json';
 
 export const getFavoriteIds = async (): Promise<string[]> => {
   try {
-    await fs.mkdir(DATA_DIR, { recursive: true });
-    try {
-      const data = await fs.readFile(FILE_PATH, 'utf-8');
-      return JSON.parse(data);
-    } catch (error) {
-      // If file doesn't exist, return empty array
-      return [];
-    }
-  } catch (error) {
-    console.error('Error reading favorites:', error);
+    const data = await fs.readFile(FILE_PATH, 'utf-8');
+    return JSON.parse(data);
+  } catch {
     return [];
   }
 };
 
 export const saveFavoriteIds = async (ids: string[]): Promise<void> => {
-  try {
-    await fs.mkdir(DATA_DIR, { recursive: true });
-    await fs.writeFile(FILE_PATH, JSON.stringify(ids, null, 2), 'utf-8');
-  } catch (error) {
-    console.error('Error saving favorites:', error);
-    throw error;
-  }
+  await fs.writeFile(FILE_PATH, JSON.stringify(ids, null, 2), 'utf-8');
 };
 
 export const toggleFavoriteId = async (id: string): Promise<string[]> => {
