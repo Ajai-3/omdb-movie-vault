@@ -68,8 +68,13 @@ export const getMoviesByIds = async (ids: string[]) => {
     );
     const responses = await Promise.all(requests);
     return responses.map((res) => ({
-        ...res.data,
-        imdbRating: res.data.imdbRating || 'N/A'
+      Title: res.data.Title,
+      Year: res.data.Year,
+      imdbID: res.data.imdbID,
+      Type: res.data.Type,
+      Poster: res.data.Poster,
+      imdbRating: res.data.imdbRating || 'N/A',
+      isFavorite: true // We know these are favorites because they came from the IDs list
     }));
   } catch (error) {
     console.error('Error fetching movies by IDs:', error);
