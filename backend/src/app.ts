@@ -3,9 +3,9 @@ dotenv.config();
 
 import express from 'express';
 import cors from 'cors';
-import movieRoutes from './routes/movie.routes.js';
-import { errorHandler } from './middleware/errorHandler.js';
-import { ROUTES } from './constants/routes.js';
+import movieRoutes from './routes/movie.routes';
+import { errorHandler } from './middleware/errorHandler';
+import { ROUTES } from './constants/routes';
 const app = express();
 
 app.use(express.json());
