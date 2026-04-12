@@ -1,6 +1,6 @@
 import type { Request, Response, NextFunction } from 'express';
 import { AxiosError } from 'axios';
-import { MOVIE_MESSAGES } from '../constants/movieMessages';
+import { MOVIE_MESSAGES } from '../constants/movieMessages.js';
 
 export class AppError extends Error {
   constructor(

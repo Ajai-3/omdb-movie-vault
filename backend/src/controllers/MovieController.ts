@@ -1,9 +1,9 @@
 import type { Request, Response, NextFunction } from 'express';
-import * as movieService from '../services/movie.service';
-import * as favoriteService from '../services/favorite.service';
-import { HttpStatus } from '../constants/https-status';
-import type { IMovieController } from '../interface/IMovieController';
-import { MOVIE_MESSAGES } from '../constants/movieMessages';
+import * as movieService from '../services/movie.service.js';
+import * as favoriteService from '../services/favorite.service.js';
+import { HttpStatus } from '../constants/https-status.js';
+import type { IMovieController } from '../interface/IMovieController.js';
+import { MOVIE_MESSAGES } from '../constants/movieMessages.js';
 
 export class MovieController implements IMovieController {
   constructor() {}
