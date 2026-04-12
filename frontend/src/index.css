@@ -1,9 +1,50 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+:root {
+  --grass-lime: #ABFF00;
+  --grass-dark: #0D110D;
+  --grass-card: #141814;
+  --grass-border: #202620;
+  --grass-muted: #808a80;
+}
 
 @layer base {
   body {
-    @apply bg-black text-slate-50;
+    @apply bg-[#0D110D] text-[#E0E7E0] antialiased selection:bg-[#ABFF00] selection:text-black;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
   }
+}
+
+@layer components {
+  .glass-card {
+    @apply bg-[#141814]/80 backdrop-blur-xl border border-[#202620] rounded-[2rem] overflow-hidden transition-all duration-500 hover:border-[#ABFF00]/30 hover:shadow-[0_0_40px_rgba(171,255,0,0.05)];
+  }
+
+  .btn-primary {
+    @apply bg-[#ABFF00] text-black px-6 py-3 rounded-xl font-bold transition-all hover:scale-105 hover:shadow-[0_0_20px_rgba(171,255,0,0.4)] active:scale-95;
+  }
+
+  .input-grass {
+    @apply bg-[#141814] border border-[#202620] rounded-2xl py-4 px-6 focus:outline-none focus:border-[#ABFF00]/50 transition-all text-lg placeholder-[#404a40];
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0D110D;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #202620;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #ABFF00;
 }
