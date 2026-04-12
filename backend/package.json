@@ -11,7 +11,7 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "start": "node dist/server.js",
+    "start": "node src/server.ts",
     "dev": "tsx --watch ./src/server.ts",
     "build": "tsc"
   },
