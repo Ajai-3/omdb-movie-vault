@@ -9,7 +9,7 @@
   "name": "omdb-movie-vault",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
     "start": "node dist/server.js",
     "dev": "tsx --watch ./src/server.ts",
