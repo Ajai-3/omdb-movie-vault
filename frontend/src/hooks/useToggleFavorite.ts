@@ -1,40 +1,38 @@
 import { useState } from 'react';
-import ApiClient from '../api/Axios';
+import apiClient from '../api/Axios';
 import { API_ROUTES } from '../constants/routes';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { addFavoriteId, removeFavoriteId } from '../store/movieSlice';
 import { toast } from 'react-toastify';
 
 export const useToggleFavorite = () => {
-  const [loading, setLoading] = useState(false);
+  const [isToggling, setIsToggling] = useState(false);
   const dispatch = useAppDispatch();
   const favoriteIds = useAppSelector((state) => state.movies.favoriteIds);
 
-  const toggleFavorite = async (id: string, title?: string) => {
-    setLoading(true);
+  const toggleFavorite = async (movieId: string, movieTitle?: string) => {
+    setIsToggling(true);
     try {
-      const { data: response } = await ApiClient.post(API_ROUTES.FAVORITES, { id });
+      const { data: apiResponse } = await apiClient.post(API_ROUTES.FAVORITES, { id: movieId });
       
-      if (response.status) {
-        if (response.data.isFavorite) {
-          dispatch(addFavoriteId(id));
-          toast.success(`${title || 'Movie'} added to favorites`);
+      if (apiResponse.status) {
+        if (apiResponse.data.isFavorite) {
+          dispatch(addFavoriteId(movieId));
+          toast.success(`${movieTitle || 'Movie'} added to favorites`);
         } else {
-          dispatch(removeFavoriteId(id));
-          toast.success(`${title || 'Movie'} removed from favorites`);
+          dispatch(removeFavoriteId(movieId));
+          toast.success(`${movieTitle || 'Movie'} removed from favorites`);
         }
       }
-    } catch (err: unknown) {
-      let message = 'Failed to update favorites';
-      if (err instanceof Error) message = err.message;
-      toast.error(message);
-      console.error('Failed to toggle favorite', err);
+    } catch (toggleError: unknown) {
+      // Error is already handled by Axios interceptor (toast)
+      console.error('Failed to toggle favorite', toggleError);
     } finally {
-      setLoading(false);
+      setIsToggling(false);
     }
   };
 
-  const isFavorite = (id: string) => favoriteIds.includes(id);
+  const isFavorite = (movieId: string) => favoriteIds.includes(movieId);
 
-  return { toggleFavorite, isFavorite, loading };
+  return { toggleFavorite, isFavorite, loading: isToggling };
 };

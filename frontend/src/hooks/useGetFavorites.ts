@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import ApiClient from '../api/Axios';
+import apiClient from '../api/Axios';
 import { API_ROUTES } from '../constants/routes';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import {
@@ -20,31 +20,31 @@ export const useGetFavorites = () => {
   } = useAppSelector((state) => state.movies);
 
   const getFavorites = useCallback(
-    async (page: number = 1, limit: number = 10) => {
+    async (currentPage: number = 1, limitAmount: number = 10) => {
       dispatch(setFavoritesLoading(true));
       dispatch(setFavoritesError(null));
       try {
-        const { data: response } = await ApiClient.get(API_ROUTES.FAVORITES, {
-          params: { page, limit },
+        const { data: apiResponse } = await apiClient.get(API_ROUTES.FAVORITES, {
+          params: { page: currentPage, limit: limitAmount },
         });
 
-        if (response.status) {
-          dispatch(setFavorites(response.data.movies || []));
+        if (apiResponse.status) {
+          dispatch(setFavorites(apiResponse.data.movies || []));
           dispatch(
             setFavoritesPagination({
-              totalResults: response.data.pagination.totalResults,
-              totalPages: response.data.pagination.totalPages,
+              totalResults: apiResponse.data.pagination.totalResults,
+              totalPages: apiResponse.data.pagination.totalPages,
             }),
           );
         } else {
           dispatch(
-            setFavoritesError(response.message || 'Failed to fetch favorites'),
+            setFavoritesError(apiResponse.message || 'Failed to fetch favorites'),
           );
         }
-      } catch (err) {
-        const message =
-          err instanceof Error ? err.message : 'Failed to fetch favorites';
-        dispatch(setFavoritesError(message));
+      } catch (fetchError: unknown) {
+        const errorMessage =
+          fetchError instanceof Error ? fetchError.message : 'Failed to fetch favorites';
+        dispatch(setFavoritesError(errorMessage));
       } finally {
         dispatch(setFavoritesLoading(false));
       }

@@ -12,8 +12,8 @@ const Favorites = () => {
     getFavorites(currentPage, 10);
   }, [currentPage, getFavorites]);
 
-  const goToNext = () => setCurrentPage((p) => Math.min(p + 1, totalPages));
-  const goToPrev = () => setCurrentPage((p) => Math.max(p - 1, 1));
+  const goToNext = () => setCurrentPage((prevPage) => Math.min(prevPage + 1, totalPages));
+  const goToPrev = () => setCurrentPage((prevPage) => Math.max(prevPage - 1, 1));
 
   return (
     <div className='space-y-8'>

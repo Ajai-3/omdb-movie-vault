@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import ApiClient from '../api/Axios';
+import apiClient from '../api/Axios';
 import { API_ROUTES } from '../constants/routes';
 import type { Movie } from '../types/movie.types';
 
@@ -18,21 +18,21 @@ export const useSearchMovies = () => {
     setLoading(true);
     setError(null);
     try {
-      const { data: response } = await ApiClient.get(API_ROUTES.SEARCH, {
-        params: { q: query.trim(), page },
+      const { data: apiResponse } = await apiClient.get(API_ROUTES.SEARCH, {
+        params: { query: query.trim(), page },
       });
 
-      if (response.status) {
-        setMovies(response.data.movies || []);
-        setTotalResults(response.data.pagination.totalResults || 0);
+      if (apiResponse.status) {
+        setMovies(apiResponse.data.movies || []);
+        setTotalResults(apiResponse.data.pagination.totalResults || 0);
       } else {
         setMovies([]);
         setTotalResults(0);
-        setError(response.message || 'No results found');
+        setError(apiResponse.message || 'No results found');
       }
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Something went wrong';
-      setError(message);
+    } catch (searchError: unknown) {
+      const errorMessage = searchError instanceof Error ? searchError.message : 'Something went wrong';
+      setError(errorMessage);
       setMovies([]);
       setTotalResults(0);
     } finally {
