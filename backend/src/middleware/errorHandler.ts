@@ -1,6 +1,6 @@
 import type { Request, Response, NextFunction } from 'express';
 import { AxiosError } from 'axios';
-import { MOVIE_MESSAGES } from '../constants/movieMessages';
+import { ERROR_MESSAGES } from '../constants/messages';
 
 export class AppError extends Error {
   constructor(
@@ -26,8 +26,8 @@ export function errorHandler(
     const axiosErr = err as AxiosError;
     const status = axiosErr.response?.status || 502;
     res.status(status).json({
-      success: false,
-      error: MOVIE_MESSAGES.FAILED_TO_REACH_OMDB_API,
+      status: false,
+      error: ERROR_MESSAGES.FAILED_TO_FETCH_MOVIES,
       statusCode: status,
     });
     return;
@@ -35,7 +35,7 @@ export function errorHandler(
 
   if (err instanceof AppError) {
     res.status(err.statusCode).json({
-      success: false,
+      status: false,
       error: err.message,
       statusCode: err.statusCode,
     });
@@ -43,8 +43,8 @@ export function errorHandler(
   }
 
   res.status(500).json({
-    success: false,
-    error: MOVIE_MESSAGES.UNEXPECTED_SERVER_ERROR,
+    status: false,
+    error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR,
     statusCode: 500,
   });
 }

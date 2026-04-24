@@ -1,81 +1,70 @@
-import axios from 'axios';
+import { injectable, inject } from 'inversify';
+import { TYPES } from '../constants/types';
+import { IMovieRepository } from '../interfaces/repositories/IMovieRepository';
+import { IMovieService } from '../interfaces/services/IMovieService';
+import { MovieMapper } from '../mappers/MovieMapper';
+import { IFavoriteRepository } from '../interfaces/repositories/IFavoriteRepository';
+import { NotFoundError } from '../errors/CustomErrors';
+import { ERROR_MESSAGES } from '../constants/messages';
+import { SearchMoviesDto, GetFavoritesDto } from '../dtos/MovieRequestDto';
 
-export const searchMovies = async (query: string, page: number = 1) => {
-  const API_KEY = process.env.OMDB_API_KEY;
-  const BASE_URL = process.env.OMDB_BASE_URL;
-  try {
-    const response = await axios.get(`${BASE_URL}/`, {
-      params: {
-        apikey: API_KEY,
-        s: query.trim(),
-        page: page,
-      },
-    });
+@injectable()
+export class MovieService implements IMovieService {
+  constructor(
+    @inject(TYPES.IMovieRepository) private readonly _movieRepository: IMovieRepository,
+    @inject(TYPES.IFavoriteRepository) private readonly _favoriteRepository: IFavoriteRepository,
+  ) {}
 
-    if (response.data.Response === 'False') {
-      return {
-        Response: 'False',
-        Error: response.data.Error,
-        Search: [],
-        totalResults: '0',
-      };
+  async searchMovies(dto: SearchMoviesDto) {
+    const apiData = await this._movieRepository.searchMovies(dto.query, dto.page);
+
+    if (apiData.Response === 'False') {
+      throw new NotFoundError(ERROR_MESSAGES.NOT_FOUND);
     }
 
-    const movies = response.data.Search || [];
+    const favoriteIds = await this._favoriteRepository.getAll();
+    const movies = apiData.Search || [];
+    
     const detailedMovies = await Promise.all(
       movies.map(async (movie: any) => {
-        try {
-          const detailRes = await axios.get(`${BASE_URL}/`, {
-            params: {
-              apikey: API_KEY,
-              i: movie.imdbID,
-            },
-          });
-          return {
-            ...movie,
-            imdbRating: detailRes.data.imdbRating || 'N/A',
-          };
-        } catch (err) {
-          return { ...movie, imdbRating: 'N/A' };
-        }
+        const details = await this._movieRepository.getMovieDetails(movie.imdbID);
+        const entity = MovieMapper.toEntity({ ...movie, ...details });
+        return {
+          ...entity,
+          isFavorite: favoriteIds.includes(entity.imdbID),
+        };
       }),
     );
+
+    return MovieMapper.toSearchResponse(apiData, detailedMovies);
+  }
+
+  async getPaginatedFavorites(dto: GetFavoritesDto) {
+    const allFavoriteIds = await this._favoriteRepository.getAll();
+    
+    const startIndex = (dto.page - 1) * dto.limit;
+    const paginatedIds = allFavoriteIds.slice(startIndex, startIndex + dto.limit);
+    
+    const movieRequests = paginatedIds.map((id) => this._movieRepository.getMovieDetails(id));
+    const movieResponses = await Promise.all(movieRequests);
+    
+    const favoriteMovies = movieResponses.map((movie) => {
+      const entity = MovieMapper.toEntity(movie);
+      return { ...entity, isFavorite: true };
+    });
 
     return {
-      ...response.data,
-      Search: detailedMovies,
+      movies: favoriteMovies,
+      totalResults: allFavoriteIds.length,
     };
-  } catch (error) {
-    console.error('Error searching movies:', error);
-    throw error;
   }
-};
 
-export const getMoviesByIds = async (ids: string[]) => {
-  const API_KEY = process.env.OMDB_API_KEY;
-  const BASE_URL = process.env.OMDB_BASE_URL;
-
-  try {
-    const requests = ids.map((id) =>
-      axios.get(`${BASE_URL}/`, {
-        params: {
-          apikey: API_KEY,
-          i: id,
-        },
-      }),
-    );
+  async getMoviesByIds(ids: string[]) {
+    const requests = ids.map((id) => this._movieRepository.getMovieDetails(id));
     const responses = await Promise.all(requests);
-    return responses.map((res) => ({
-      Title: res.data.Title,
-      Year: res.data.Year,
-      imdbID: res.data.imdbID,
-      Type: res.data.Type,
-      Poster: res.data.Poster,
-      imdbRating: res.data.imdbRating || 'N/A',
-      isFavorite: true,
-    }));
-  } catch (error) {
-    console.error('Error fetching movies by IDs:', error);
-    throw error;
+    return responses.map((movie) => {
+      const entity = MovieMapper.toEntity(movie);
+      return { ...entity, isFavorite: true };
+    });
   }
-};
+}

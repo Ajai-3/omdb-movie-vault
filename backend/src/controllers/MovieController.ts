@@ -1,67 +1,44 @@
 import type { Request, Response, NextFunction } from 'express';
-import * as movieService from '../services/movie.service';
-import * as favoriteService from '../services/favorite.service';
+import { injectable, inject } from 'inversify';
+import { TYPES } from '../constants/types';
+import { IMovieService } from '../interfaces/services/IMovieService';
+import { IFavoriteService } from '../interfaces/services/IFavoriteService';
 import { HttpStatus } from '../constants/https-status';
-import type { IMovieController } from '../interface/IMovieController';
-import { MOVIE_MESSAGES } from '../constants/movieMessages';
+import { SUCCESS_MESSAGES } from '../constants/messages';
+import { IMovieController } from '../interfaces/IMovieController';
+import { SearchMoviesDto, GetFavoritesDto } from '../dtos/MovieRequestDto';
 
+@injectable()
 export class MovieController implements IMovieController {
-  constructor() {}
+  constructor(
+    @inject(TYPES.IMovieService) private readonly _movieService: IMovieService,
+    @inject(TYPES.IFavoriteService) private readonly _favoriteService: IFavoriteService,
+  ) {}
 
-  searchMovie = async (
+  searchMovies = async (
     req: Request,
     res: Response,
     next: NextFunction,
   ): Promise<Response | void> => {
     try {
-      const { q, page, limit } = req.query;
-      const p = page ? parseInt(page as string) : 1;
-      const l = limit ? parseInt(limit as string) : 10;
+      const { query, page, limit } = req.query as any;
+      const searchDto: SearchMoviesDto = {
+        query,
+        page: page ? parseInt(page) : 1,
+        limit: limit ? parseInt(limit) : 10,
+      };
 
-      if (!q) {
-        return res.status(HttpStatus.BAD_REQUEST).json({
-          status: true,
-          message: MOVIE_MESSAGES.PROVIDE_SEARCH_QUERY,
-          data: {
-            movies: [],
-            pagination: { totalResults: 0, totalPages: 0, currentPage: p },
-          },
-        });
-      }
+      const data = await this._movieService.searchMovies(searchDto);
 
-      const data = await movieService.searchMovies(q as string, p);
-
-      if (data.Response === 'False') {
-        return res.status(HttpStatus.OK).json({
-          status: false,
-          message: MOVIE_MESSAGES.NOT_FOUND,
-          data: {
-            movies: [],
-            pagination: {
-              totalResults: 0,
-              totalPages: 0,
-              currentPage: p,
-            },
-          },
-        });
-      }
-
-      const favoriteIds = await favoriteService.getFavoriteIds();
-      const enrichedMovies = (data.Search || []).map((movie: any) => ({
-        ...movie,
-        isFavorite: favoriteIds.includes(movie.imdbID),
-      }));
-
-      const totalResults = parseInt(data.totalResults);
       return res.status(HttpStatus.OK).json({
         status: true,
-        message: MOVIE_MESSAGES.SUCCESS,
+        message: SUCCESS_MESSAGES.FETCHED_SUCCESSFULLY,
         data: {
-          movies: enrichedMovies,
+          movies: data.movies,
           pagination: {
-            totalResults: totalResults,
-            totalPages: Math.ceil(totalResults / l),
-            currentPage: p,
+            totalResults: parseInt(data.totalResults),
+            totalPages: Math.ceil(parseInt(data.totalResults) / searchDto.limit),
+            currentPage: searchDto.page,
           },
         },
       });
@@ -76,40 +53,23 @@ export class MovieController implements IMovieController {
     next: NextFunction,
   ): Promise<Response | void> => {
     try {
-      const { page, limit } = req.query;
-      const p = page ? parseInt(page as string) : 1;
-      const l = limit ? parseInt(limit as string) : 10;
+      const { page, limit } = req.query as any;
+      const favoriteDto: GetFavoritesDto = {
+        page: page ? parseInt(page) : 1,
+        limit: limit ? parseInt(limit) : 10,
+      };
 
-      const ids = await favoriteService.getFavoriteIds();
-
-      if (ids.length === 0) {
-        return res.status(HttpStatus.OK).json({
-          status: true,
-          message: MOVIE_MESSAGES.FAVORITES_EMPTY,
-          data: {
-            movies: [],
-            pagination: {
-              totalResults: 0,
-              totalPages: 0,
-              currentPage: p,
-            },
-          },
-        });
-      }
-
-      const startIndex = (p - 1) * l;
-      const paginatedIds = ids.slice(startIndex, startIndex + l);
-      const movies = await movieService.getMoviesByIds(paginatedIds);
+      const data = await this._movieService.getPaginatedFavorites(favoriteDto);
 
       return res.status(HttpStatus.OK).json({
         status: true,
-        message: MOVIE_MESSAGES.FAVORITES_SUCCESS,
+        message: SUCCESS_MESSAGES.FETCHED_SUCCESSFULLY,
         data: {
-          movies: movies,
+          movies: data.movies,
           pagination: {
-            totalResults: ids.length,
-            totalPages: Math.ceil(ids.length / l),
-            currentPage: p,
+            totalResults: data.totalResults,
+            totalPages: Math.ceil(data.totalResults / favoriteDto.limit),
+            currentPage: favoriteDto.page,
           },
         },
       });
@@ -124,24 +84,16 @@ export class MovieController implements IMovieController {
     next: NextFunction,
   ): Promise<Response | void> => {
     try {
-      const { id } = req.body;
-      if (!id) {
-        return res.status(HttpStatus.BAD_REQUEST).json({
-          status: false,
-          message: MOVIE_MESSAGES.MOVIE_ID_REQUIRED,
-          data: null,
-        });
-      }
-
-      const updatedIds = await favoriteService.toggleFavoriteId(id);
-      const isAdded = updatedIds.includes(id);
+      const { id: movieId } = req.body;
+      const updatedIds = await this._favoriteService.toggleFavorite(movieId);
+      const isFavorite = updatedIds.includes(movieId);
 
       return res.status(HttpStatus.OK).json({
         status: true,
-        message: isAdded
-          ? MOVIE_MESSAGES.FAVORITES_ADD
-          : MOVIE_MESSAGES.FAVORITES_REMOVE,
-        data: { id, isFavorite: isAdded },
+        message: isFavorite
+          ? SUCCESS_MESSAGES.FAVORITES_ADDED
+          : SUCCESS_MESSAGES.FAVORITES_REMOVED,
+        data: { id: movieId, isFavorite },
       });
     } catch (error) {
       next(error);

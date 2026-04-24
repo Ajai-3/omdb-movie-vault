@@ -1,4 +1,4 @@
-export interface IMovie {
+export interface MovieDto {
   imdbID: string;
   Title: string;
   Year: string;
@@ -8,8 +8,8 @@ export interface IMovie {
   isFavorite?: boolean;
 }
 
-export interface ISearchResponse {
-  Search?: IMovie[];
+export interface SearchResponseDto {
+  Search?: MovieDto[];
   totalResults?: string;
   Response: string;
   Error?: string;
