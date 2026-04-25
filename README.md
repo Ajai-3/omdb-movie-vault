@@ -92,19 +92,40 @@ npm run dev
 ## Project Structure
 
 ```plaintext
+.
 ├── backend/
 │   ├── src/
-│   │   ├── controllers/   # Request orchestration
-│   │   ├── services/      # Business logic (OMDb & Storage)
-│   │   ├── routes/        # API route definitions
-│   │   └── server.ts      # Server entry point
-│   └── data/              # JSON vault storage
+│   │   ├── config/         # Environment and global configuration
+│   │   ├── constants/      # Backend constants
+│   │   ├── controllers/    # Request orchestration and validation
+│   │   ├── dtos/           # Data Transfer Objects
+│   │   ├── entities/       # Domain entities/models
+│   │   ├── errors/         # Custom error classes and handlers
+│   │   ├── interfaces/     # TypeScript interfaces and types
+│   │   ├── mappers/        # Data transformation logic
+│   │   ├── middleware/     # Express middlewares (Zod, Logging, Errors)
+│   │   ├── repositories/   # Data access layer (JSON storage)
+│   │   ├── routes/         # API route definitions
+│   │   ├── schemas/        # Zod validation schemas
+│   │   ├── services/       # Business logic and OMDb integration
+│   │   ├── app.ts          # Express app configuration
+│   │   └── server.ts       # Server entry point
+│   ├── favorites.json      # JSON-based persistent storage
+│   ├── Dockerfile          # Docker configuration
+│   └── docker-compose.yml  # Docker compose orchestration
 ├── frontend/
 │   ├── src/
-│   │   ├── store/         # Redux configuration and slices
-│   │   ├── hooks/         # Specialized business logic hooks
-│   │   ├── components/    # Reusable UI elements
-│   │   └── pages/         # Application views
+│   │   ├── api/            # API client and service calls
+│   │   ├── components/     # Reusable UI elements
+│   │   ├── constants/      # Frontend constants
+│   │   ├── hooks/          # Specialized business logic hooks
+│   │   ├── pages/          # Application views
+│   │   ├── store/          # Redux configuration and slices
+│   │   ├── types/          # TypeScript type definitions
+│   │   ├── App.tsx         # Main application component
+│   │   └── main.tsx        # Frontend entry point
+│   └── vite.config.ts      # Vite build configuration
+├── API_DOCUMENTATION.md    # Detailed API technical specifications
 └── README.md
 ```
 
@@ -119,4 +140,4 @@ npm run dev
 ## Notes
 
 - Ensure your OMDb API key is valid; otherwise, search results will not load.
-- The favorites vault is stored in `backend/data/favorites.json`.
+- The favorites vault is stored in `backend/favorites.json`.
