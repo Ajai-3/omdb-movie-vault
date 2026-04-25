@@ -1,6 +1,6 @@
 import fs from 'fs/promises';
 import { injectable } from 'inversify';
-import { IFavoriteRepository } from '../interfaces/repositories/IFavoriteRepository';
+import { IFavoriteRepository } from '@/interfaces/repositories/IFavoriteRepository';
 
 @injectable()
 export class FavoriteRepository implements IFavoriteRepository {

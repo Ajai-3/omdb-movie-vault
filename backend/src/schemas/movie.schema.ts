@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ERROR_MESSAGES } from '../constants/messages';
+import { ERROR_MESSAGES } from '@/constants/messages';
 
 export const searchMoviesSchema = z.object({
   query: z.object({

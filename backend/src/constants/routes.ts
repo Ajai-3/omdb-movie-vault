@@ -1,4 +1,6 @@
 export const ROUTES = {
+  HEALTH:'/health',
+  
   BASE: '/api/movies',
 
   MOVIES: {

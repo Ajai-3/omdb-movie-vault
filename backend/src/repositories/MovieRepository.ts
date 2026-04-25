@@ -1,41 +1,40 @@
 import axios from 'axios';
+import { env } from '../config/env';
 import { injectable } from 'inversify';
-import { AppError } from '../middleware/errorHandler';
-import { ERROR_MESSAGES } from '../constants/messages';
-import { IMovieRepository } from '../interfaces/repositories/IMovieRepository';
+import { Movie } from '@/entities/Movie';
+import { MovieMapper } from '@/mappers/MovieMapper';
+import { OmdbMovieDetails, OmdbSearchResponse } from '@/interfaces/external/IOmdbResponse';
+import { IMovieRepository, MovieSearchResult } from '@/interfaces/repositories/IMovieRepository';
 
 @injectable()
 export class MovieRepository implements IMovieRepository {
-  private readonly _apiKey = process.env.OMDB_API_KEY;
-  private readonly _baseUrl = process.env.OMDB_BASE_URL;
+  private readonly _apiKey = env.omdb_api_key;
+  private readonly _baseUrl = env.omdb_base_url;
 
-  async searchMovies(query: string, page: number = 1) {
-    try {
-      const response = await axios.get(`${this._baseUrl}/`, {
-        params: {
-          apikey: this._apiKey,
-          s: query.trim(),
-          page: page,
-        },
-      });
+  async searchMovies(query: string, page: number = 1): Promise<MovieSearchResult> {
+    const response = await axios.get<OmdbSearchResponse>(this._baseUrl as string, {
+      params: {
+        apikey: this._apiKey,
+        s: query.trim(),
+        page: page,
+      },
+    });
 
-      return response.data;
-    } catch (error) {
-      throw new AppError(ERROR_MESSAGES.FAILED_TO_FETCH_MOVIES, 502);
-    }
+    return MovieMapper.toSearchResult(response.data);
   }
 
-  async getMovieDetails(imdbId: string) {
-    try {
-      const response = await axios.get(`${this._baseUrl}/`, {
-        params: {
-          apikey: this._apiKey,
-          i: imdbId,
-        },
-      });
-      return response.data;
-    } catch (error) {
-      return { imdbRating: 'N/A' };
+  async getMovieDetails(imdbId: string): Promise<Movie | null> {
+    const response = await axios.get<OmdbMovieDetails>(this._baseUrl as string, {
+      params: {
+        apikey: this._apiKey,
+        i: imdbId,
+      },
+    });
+
+    if (response.data.Response === 'False') {
+      return null;
     }
+
+    return MovieMapper.toEntity(response.data);
   }
 }

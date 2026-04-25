@@ -1,7 +1,7 @@
+import { TYPES } from '@/constants/types';
 import { injectable, inject } from 'inversify';
-import { TYPES } from '../constants/types';
-import { IFavoriteRepository } from '../interfaces/repositories/IFavoriteRepository';
-import { IFavoriteService } from '../interfaces/services/IFavoriteService';
+import { IFavoriteService } from '@/interfaces/services/IFavoriteService';
+import { IFavoriteRepository } from '@/interfaces/repositories/IFavoriteRepository';
 
 @injectable()
 export class FavoriteService implements IFavoriteService {

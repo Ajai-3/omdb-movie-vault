@@ -1,6 +1,7 @@
 import type { Request, Response, NextFunction } from 'express';
 import { AxiosError } from 'axios';
-import { ERROR_MESSAGES } from '../constants/messages';
+import { ERROR_MESSAGES } from '@/constants/messages';
+import { HttpStatus } from '@/constants/https-status';
 
 export class AppError extends Error {
   constructor(
@@ -20,11 +21,11 @@ export function errorHandler(
   res: Response,
   _next: NextFunction,
 ): void {
-  console.error('[ErrorHandler]', err.message);
+  console.error('[ErrorHandler] Full Error:', err);
 
   if ((err as AxiosError).isAxiosError) {
     const axiosErr = err as AxiosError;
-    const status = axiosErr.response?.status || 502;
+    const status = axiosErr.response?.status || HttpStatus.BAD_GATEWAY;
     res.status(status).json({
       status: false,
       error: ERROR_MESSAGES.FAILED_TO_FETCH_MOVIES,
@@ -42,9 +43,9 @@ export function errorHandler(
     return;
   }
 
-  res.status(500).json({
+  res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
     status: false,
     error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR,
-    statusCode: 500,
+    statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
   });
 }

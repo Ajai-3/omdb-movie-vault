@@ -1,12 +1,11 @@
+import { TYPES } from '@/constants/types';
 import { injectable, inject } from 'inversify';
-import { TYPES } from '../constants/types';
-import { IMovieRepository } from '../interfaces/repositories/IMovieRepository';
-import { IMovieService } from '../interfaces/services/IMovieService';
-import { MovieMapper } from '../mappers/MovieMapper';
-import { IFavoriteRepository } from '../interfaces/repositories/IFavoriteRepository';
-import { NotFoundError } from '../errors/CustomErrors';
-import { ERROR_MESSAGES } from '../constants/messages';
-import { SearchMoviesDto, GetFavoritesDto } from '../dtos/MovieRequestDto';
+import { NotFoundError } from '@/errors/CustomErrors';
+import { ERROR_MESSAGES } from '@/constants/messages';
+import { IMovieService } from '@/interfaces/services/IMovieService';
+import { SearchMoviesDto, GetFavoritesDto } from '@/dtos/MovieRequestDto';
+import { IMovieRepository } from '@/interfaces/repositories/IMovieRepository';
+import { IFavoriteRepository } from '@/interfaces/repositories/IFavoriteRepository';
 
 @injectable()
 export class MovieService implements IMovieService {
@@ -16,27 +15,50 @@ export class MovieService implements IMovieService {
   ) {}
 
   async searchMovies(dto: SearchMoviesDto) {
-    const apiData = await this._movieRepository.searchMovies(dto.query, dto.page);
+    const searchResult = await this._movieRepository.searchMovies(dto.query, dto.page);
 
-    if (apiData.Response === 'False') {
-      throw new NotFoundError(ERROR_MESSAGES.NOT_FOUND);
+    if (!searchResult.response) {
+      if (searchResult.error === 'Too many results.') {
+        return {
+          movies: [],
+          totalResults: 0,
+          response: true,
+          message: ERROR_MESSAGES.TOO_MANY_RESULTS,
+        };
+      }
+      throw new NotFoundError(searchResult.error || ERROR_MESSAGES.NOT_FOUND);
     }
 
     const favoriteIds = await this._favoriteRepository.getAll();
-    const movies = apiData.Search || [];
-    
-    const detailedMovies = await Promise.all(
-      movies.map(async (movie: any) => {
-        const details = await this._movieRepository.getMovieDetails(movie.imdbID);
-        const entity = MovieMapper.toEntity({ ...movie, ...details });
-        return {
-          ...entity,
-          isFavorite: favoriteIds.includes(entity.imdbID),
-        };
-      }),
-    );
+    const detailedMovies = [];
 
-    return MovieMapper.toSearchResponse(apiData, detailedMovies);
+    for (const movie of searchResult.movies) {
+      try {
+        const details = await this._movieRepository.getMovieDetails(movie.imdbId);
+        if (details) {
+          detailedMovies.push({
+            ...details,
+            isFavorite: favoriteIds.includes(movie.imdbId),
+          });
+        } else {
+          detailedMovies.push({
+            ...movie,
+            isFavorite: favoriteIds.includes(movie.imdbId),
+          });
+        }
+      } catch (error) {
+        detailedMovies.push({
+          ...movie,
+          isFavorite: favoriteIds.includes(movie.imdbId),
+        });
+      }
+    }
+
+    return {
+      movies: detailedMovies,
+      totalResults: searchResult.totalResults,
+      response: true,
+    };
   }
 
   async getPaginatedFavorites(dto: GetFavoritesDto) {
@@ -45,13 +67,17 @@ export class MovieService implements IMovieService {
     const startIndex = (dto.page - 1) * dto.limit;
     const paginatedIds = allFavoriteIds.slice(startIndex, startIndex + dto.limit);
     
-    const movieRequests = paginatedIds.map((id) => this._movieRepository.getMovieDetails(id));
-    const movieResponses = await Promise.all(movieRequests);
-    
-    const favoriteMovies = movieResponses.map((movie) => {
-      const entity = MovieMapper.toEntity(movie);
-      return { ...entity, isFavorite: true };
-    });
+    const favoriteMovies = [];
+    for (const id of paginatedIds) {
+      try {
+        const movie = await this._movieRepository.getMovieDetails(id);
+        if (movie) {
+          favoriteMovies.push({ ...movie, isFavorite: true });
+        }
+      } catch (error) {
+   
+      }
+    }
 
     return {
       movies: favoriteMovies,
@@ -60,11 +86,17 @@ export class MovieService implements IMovieService {
   }
 
   async getMoviesByIds(ids: string[]) {
-    const requests = ids.map((id) => this._movieRepository.getMovieDetails(id));
-    const responses = await Promise.all(requests);
-    return responses.map((movie) => {
-      const entity = MovieMapper.toEntity(movie);
-      return { ...entity, isFavorite: true };
-    });
+    const movies = [];
+    for (const id of ids) {
+      try {
+        const movie = await this._movieRepository.getMovieDetails(id);
+        if (movie) {
+          movies.push({ ...movie, isFavorite: true });
+        }
+      } catch (error) {
+
+      }
+    }
+    return movies;
   }
 }

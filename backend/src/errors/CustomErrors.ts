@@ -1,5 +1,5 @@
-import { HttpStatus } from '../constants/https-status';
 import { AppError } from '../middleware/errorHandler';
+import { HttpStatus } from '../constants/https-status';
 
 export class BadRequestError extends AppError {
   constructor(message: string) {

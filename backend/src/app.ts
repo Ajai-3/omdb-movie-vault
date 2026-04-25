@@ -1,12 +1,10 @@
-import 'reflect-metadata';
-import dotenv from 'dotenv';
-dotenv.config();
-
-import express from 'express';
 import cors from 'cors';
-import movieRoutes from './routes/movie.routes';
-import { errorHandler } from './middleware/errorHandler';
-import { ROUTES } from './constants/routes';
+import express from 'express';
+import { env } from '@/config/env';
+import { ROUTES } from '@/constants/routes';
+import movieRoutes from '@/routes/movie.routes';
+import { errorHandler } from '@/middleware/errorHandler';
+
 const app = express();
 
 app.use(express.json());
@@ -14,13 +12,13 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL,
+    origin: env.frontend_url,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   }),
 );
 
-app.use('/health', (req, res) => {
-  res.send('Healthy');
+app.use(ROUTES.HEALTH, (req, res) => {
+  res.send('Server is Healthy...😊');
 });
 
 app.use(ROUTES.BASE, movieRoutes);
