@@ -1,6 +1,7 @@
-import axios, { InternalAxiosRequestConfig, AxiosResponse } from 'axios';
+import axios from 'axios';
 import { toast } from 'react-toastify';
 import { ERROR_MESSAGES } from '../constants/messages';
+import type { InternalAxiosRequestConfig, AxiosResponse } from 'axios';
 
 const apiClient = axios.create({
   baseURL: import.meta.env.VITE_BASE_URL,
@@ -14,8 +15,8 @@ const STATUS_ERROR_MAP: Record<number, string> = {
   400: ERROR_MESSAGES.BAD_REQUEST,
   401: ERROR_MESSAGES.UNAUTHORIZED,
   404: ERROR_MESSAGES.NOT_FOUND,
-  500: 'Internal Server Error. Please try again later.',
-  502: 'Service Unavailable. The movie database is not responding.',
+  500: ERROR_MESSAGES.INTERNAL_SERVER_ERROR,
+  502: ERROR_MESSAGES.SERVICE_UNAVAILABLE,
 };
 
 // Request Interceptor
@@ -35,7 +36,11 @@ apiClient.interceptors.response.use(
 
     if (error.response) {
       const { status, data } = error.response;
-      errorMessage = data?.error || data?.message || STATUS_ERROR_MAP[status] || ERROR_MESSAGES.GENERAL;
+      errorMessage =
+        data?.error ||
+        data?.message ||
+        STATUS_ERROR_MAP[status] ||
+        ERROR_MESSAGES.GENERAL;
       toast.error(errorMessage);
     } else if (error.request) {
       toast.error(ERROR_MESSAGES.NETWORK);

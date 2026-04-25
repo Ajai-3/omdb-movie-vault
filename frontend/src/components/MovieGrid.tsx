@@ -60,7 +60,7 @@ const MovieGrid: React.FC<Props> = ({
 
       <div className='movie-grid'>
         {movies.map((movie) => (
-          <MovieCard key={movie.imdbID} movie={movie} />
+          <MovieCard key={movie.imdbId} movie={movie} />
         ))}
       </div>
 

@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
 import apiClient from '../api/Axios';
 import { API_ROUTES } from '../constants/routes';
+import type { Movie, ApiResponse } from '../types/movie.types';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import {
   setFavorites,
@@ -8,6 +9,7 @@ import {
   setFavoritesError,
   setFavoritesPagination,
 } from '../store/movieSlice';
+import { FAVORITE_MESSAGES } from '../constants/messages';
 
 export const useGetFavorites = () => {
   const dispatch = useAppDispatch();
@@ -24,7 +26,7 @@ export const useGetFavorites = () => {
       dispatch(setFavoritesLoading(true));
       dispatch(setFavoritesError(null));
       try {
-        const { data: apiResponse } = await apiClient.get(API_ROUTES.FAVORITES, {
+        const { data: apiResponse } = await apiClient.get<ApiResponse<{ movies: Movie[]; pagination: { totalResults: number; totalPages: number } }>>(API_ROUTES.FAVORITES, {
           params: { page: currentPage, limit: limitAmount },
         });
 
@@ -38,12 +40,12 @@ export const useGetFavorites = () => {
           );
         } else {
           dispatch(
-            setFavoritesError(apiResponse.message || 'Failed to fetch favorites'),
+            setFavoritesError(apiResponse.message || FAVORITE_MESSAGES.FAILED_TO_FETCH_FAVORITES),
           );
         }
       } catch (fetchError: unknown) {
         const errorMessage =
-          fetchError instanceof Error ? fetchError.message : 'Failed to fetch favorites';
+          fetchError instanceof Error ? fetchError.message : FAVORITE_MESSAGES.FAILED_TO_FETCH_FAVORITES;
         dispatch(setFavoritesError(errorMessage));
       } finally {
         dispatch(setFavoritesLoading(false));

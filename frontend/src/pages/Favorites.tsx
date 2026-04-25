@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { useGetFavorites } from '../hooks/useGetFavorites';
 import MovieCard from '../components/MovieCard';
+import { useGetFavorites } from '../hooks/useGetFavorites';
 import { Heart, Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
 
 const Favorites = () => {
@@ -65,7 +65,7 @@ const Favorites = () => {
       {!loading && !error && favorites.length > 0 && (
         <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6'>
           {favorites.map((movie) => (
-            <MovieCard key={movie.imdbID} movie={movie} />
+            <MovieCard key={movie.imdbId} movie={movie} />
           ))}
         </div>
       )}

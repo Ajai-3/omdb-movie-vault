@@ -25,7 +25,7 @@ const movieSlice = createSlice({
   reducers: {
     setFavorites: (state, action: PayloadAction<Movie[]>) => {
       state.favorites = action.payload;
-      state.favoriteIds = action.payload.map(m => m.imdbID);
+      state.favoriteIds = action.payload.map(m => m.imdbId);
     },
     setFavoritesPagination: (state, action: PayloadAction<{ totalPages: number; totalResults: number }>) => {
       state.totalPages = action.payload.totalPages;
@@ -44,7 +44,7 @@ const movieSlice = createSlice({
     },
     removeFavoriteId: (state, action: PayloadAction<string>) => {
       state.favoriteIds = state.favoriteIds.filter((id) => id !== action.payload);
-      state.favorites = state.favorites.filter((movie) => movie.imdbID !== action.payload);
+      state.favorites = state.favorites.filter((movie) => movie.imdbId !== action.payload);
     },
   },
 });

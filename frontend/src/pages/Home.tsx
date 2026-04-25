@@ -1,21 +1,30 @@
 import { useState, useEffect } from 'react';
-import { useSearchMovies } from '../hooks/useSearchMovies';
-import MovieCard from '../components/MovieCard';
-import { Loader2, ChevronLeft, ChevronRight, SearchIcon } from 'lucide-react';
 import useDebounce from '../hooks/useDebounce';
+import MovieCard from '../components/MovieCard';
+import { useSearchParams } from 'react-router-dom';
+import { useSearchMovies } from '../hooks/useSearchMovies';
+import { Loader2, ChevronLeft, ChevronRight, SearchIcon } from 'lucide-react';
 
 const Home = () => {
-  const [query, setQuery] = useState('');
-  const [page, setPage] = useState(1);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const initialQuery = searchParams.get('query') || '';
+  const initialPage = parseInt(searchParams.get('page') || '1');
+
+  const [query, setQuery] = useState(initialQuery);
+  const [page, setPage] = useState(initialPage);
   const debouncedQuery = useDebounce(query, 600);
 
   const { movies, loading, error, totalResults, searchMovies } =
     useSearchMovies();
 
-  // Search when debounced query or page changes
   useEffect(() => {
     searchMovies(debouncedQuery, page);
-  }, [debouncedQuery, page, searchMovies]);
+    
+    const params: { query?: string; page?: string } = {};
+    if (debouncedQuery) params.query = debouncedQuery;
+    if (page > 1) params.page = page.toString();
+    setSearchParams(params, { replace: true });
+  }, [debouncedQuery, page, searchMovies, setSearchParams]);
 
   const handleQueryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setQuery(e.target.value);
@@ -119,7 +128,7 @@ const Home = () => {
       {!loading && movies.length > 0 && (
         <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-8'>
           {movies.map((movie) => (
-            <MovieCard key={movie.imdbID} movie={movie} />
+            <MovieCard key={movie.imdbId} movie={movie} />
           ))}
         </div>
       )}
